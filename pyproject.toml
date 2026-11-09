@@ -1,0 +1,20 @@
+[project]
+name = "tp-1"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { email = "yousrabenmehidi@gmail.com" }
+]
+requires-python = ">=3.12"
+dependencies = [
+    "flasgger>=0.9.7.1",
+    "flask>=3.1.3",
+]
+
+[project.scripts]
+tp-1 = "tp_1:main"
+
+[build-system]
+requires = ["uv_build>=0.12.19,<0.13.0"]
+build-backend = "uv_build"
