@@ -1,3 +1,4 @@
+#build stage
 FROM python:3.12-slim
 
 WORKDIR /app
@@ -9,6 +10,7 @@ RUN uv sync --locked --no-dev --no-install-project
 
 COPY . .
 
+#run stage (settings and start command)
 ENV PYTHONPATH=/app/src
 ENV BOOKS_DB=/data/books.db
 VOLUME /data
