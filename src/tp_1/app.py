@@ -51,6 +51,38 @@ def add_book():
 
 @app.put('/rentedbooks/<int:book_id>')
 def rent_book(book_id):
+    """
+    Rent or return a book.
+    Use rent=true with a body to rent it, rent=false to return it.
+    ---
+    parameters:
+      - in: path
+        name: book_id
+        type: integer
+        required: true
+      - in: query
+        name: rent
+        type: string
+        enum: ['true', 'false']
+        required: true
+      - in: body
+        name: body
+        description: Required only when rent=true
+        schema:
+          type: object
+          properties:
+            rental_date: {type: string, example: '2026-11-01'}
+            return_date: {type: string, example: '2026-11-15'}
+    responses:
+      200:
+        description: Book rented or returned
+      400:
+        description: Invalid rent parameter or missing dates
+      404:
+        description: Book does not exist
+      409:
+        description: Book already rented / not rented
+    """
     book = db.get_book(book_id)
     if book is None:
         return {'message': f'Book {book_id} does not exist'}, 404
@@ -73,6 +105,20 @@ def rent_book(book_id):
 
 @app.get('/books/<int:book_id>')
 def get_book(book_id):
+    """
+    Get one book.
+    ---
+    parameters:
+      - in: path
+        name: book_id
+        type: integer
+        required: true
+    responses:
+      200:
+        description: The book
+      404:
+        description: Book does not exist
+    """
     book = db.get_book(book_id)
     if book is None:
         return {'message': f'Book {book_id} does not exist'}, 404
