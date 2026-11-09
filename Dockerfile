@@ -9,6 +9,10 @@ RUN uv sync --locked --no-dev --no-install-project
 
 COPY . .
 
+ENV PYTHONPATH=/app/src
+ENV BOOKS_DB=/data/books.db
+VOLUME /data
+
 EXPOSE 5000
 
 CMD ["uv", "run", "--no-sync", "python", "src/tp_1/app.py"]
