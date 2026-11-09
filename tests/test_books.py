@@ -75,3 +75,38 @@ def test_rent_without_dates_returns_400(client):
 def test_invalid_rent_parameter_returns_400(client):
     response = client.put("/rentedbooks/1?rent=maybe")
     assert response.status_code == 400
+
+
+def test_delete_book(client):
+    response = client.delete("/books/1")
+    assert response.status_code == 200
+    assert client.get("/books/1").status_code == 404
+
+
+def test_delete_unknown_book_returns_404(client):
+    assert client.delete("/books/999").status_code == 404
+
+
+def test_delete_rented_book_returns_409(client):
+    client.put("/rentedbooks/1?rent=true", json=RENTAL)
+    assert client.delete("/books/1").status_code == 409
+    # The book must still exist.
+    assert client.get("/books/1").status_code == 200
+
+
+def test_edit_book(client):
+    response = client.put("/books/1", json={"title": "The Dragon Republic"})
+    assert response.status_code == 200
+    book = client.get("/books/1").get_json()
+    # Only the title changed; the author is untouched.
+    assert book["title"] == "The Dragon Republic"
+    assert book["author"] == "R. F. Kuang"
+
+
+def test_edit_unknown_book_returns_404(client):
+    assert client.put("/books/999", json={"title": "X"}).status_code == 404
+
+
+def test_edit_book_with_nothing_to_change_returns_400(client):
+    assert client.put("/books/1", json={}).status_code == 400
+    assert client.put("/books/1", json={"title": ""}).status_code == 400

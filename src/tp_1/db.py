@@ -66,3 +66,17 @@ def set_rental(book_id, rented, rental_date=None, return_date=None):
             "UPDATE books SET rented = ?, rental_date = ?, return_date = ? WHERE id = ?",
             (int(rented), rental_date, return_date, book_id),
         )
+
+
+def delete_book(book_id):
+    with get_connection() as conn:
+        conn.execute("DELETE FROM books WHERE id = ?", (book_id,))
+
+
+def update_book(book_id, title=None, author=None):
+    """Update only the fields that are given."""
+    with get_connection() as conn:
+        conn.execute(
+            "UPDATE books SET title = COALESCE(?, title), author = COALESCE(?, author) WHERE id = ?",
+            (title, author, book_id),
+        )

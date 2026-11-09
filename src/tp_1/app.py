@@ -79,5 +79,68 @@ def get_book(book_id):
     return {'title': book['title'], 'author': book['author'], 'rented': book['rented']}
 
 
+@app.put('/books/<int:book_id>')
+def edit_book(book_id):
+    """
+    Edit a book's title and/or author.
+    ---
+    parameters:
+      - in: path
+        name: book_id
+        type: integer
+        required: true
+      - in: body
+        name: body
+        schema:
+          type: object
+          properties:
+            title: {type: string}
+            author: {type: string}
+    responses:
+      200:
+        description: Book updated
+      400:
+        description: Nothing valid to update
+      404:
+        description: Book does not exist
+    """
+    if db.get_book(book_id) is None:
+        return {'message': f'Book {book_id} does not exist'}, 404
+    body = request.get_json(silent=True) or {}
+    title = body.get('title') or None
+    author = body.get('author') or None
+    if title is None and author is None:
+        return {'message': 'provide a non-empty title and/or author'}, 400
+    db.update_book(book_id, title, author)
+    return {'message': f'Book {book_id} updated'}
+
+
+@app.delete('/books/<int:book_id>')
+def delete_book(book_id):
+    """
+    Delete a book (it must not be currently rented).
+    ---
+    parameters:
+      - in: path
+        name: book_id
+        type: integer
+        required: true
+    responses:
+      200:
+        description: Book deleted
+      404:
+        description: Book does not exist
+      409:
+        description: Book is currently rented
+    """
+    book = db.get_book(book_id)
+    if book is None:
+        return {'message': f'Book {book_id} does not exist'}, 404
+    if book['rented']:
+        return {'message': 'A rented book cannot be deleted'}, 409
+    db.delete_book(book_id)
+    return {'message': f'Book {book_id} deleted'}
+
+
 if __name__ == '__main__':
     app.run(host="0.0.0.0", port=5000)
